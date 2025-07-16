@@ -7,8 +7,11 @@ $atributo = $_GET['atributo'];
 // $stmt->bind_param("s", $atributo);
 // $stmt->execute();
 
-$sql = "SELECT id, faccion, atributo, numero from casas WHERE atributo = '$atributo' ORDER BY numero ASC";
+$sql = "SELECT id, faccion, atributo, numero from casas WHERE atributo = '$atributo' ORDER BY faccion ASC, numero ASC";
 $result = mysqli_query($con, $sql);
+
+$sql = "SELECT id, nombre, atributo, n_casa, icono FROM heroes WHERE atributo = '$atributo' ORDER BY nombre ASC";
+$resulth = mysqli_query($con, $sql);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -21,9 +24,10 @@ $result = mysqli_query($con, $sql);
 <body>
     <div class="container">
         <nav class="topbar">
-            <a href="#">Heroes</a>
+            <a href="heroes.php">Heroes</a>
             <a href="#">Objetos</a>
             <a href="#">Tutoriales</a>
+            <a href="formularioheores.php">Añadir</a>
             <!-- <ul>
                 <li><a href="#">Heroes</a></li>
                 <li><a href="#">Objetos</a></li>
@@ -31,84 +35,73 @@ $result = mysqli_query($con, $sql);
             </ul> -->
         </nav>
         <nav class="sidebar">
-            <a href="#">Fuerza</a>
-            <a href="#">Agilidad</a>
-            <a href="#">Inteligencia</a>
+            <a href="heroes.php?atributo=fuerza">Fuerza</a>
+            <a href="heroes.php?atributo=agilidad">Agilidad</a>
+            <a href="heroes.php?atributo=inteligencia">Inteligencia</a>
         </nav>
 
         <div class="content">
-            <div class="grid-container">
+            <?php
+            foreach ($result as $row) {
+            ?>
+            <div class="grid-container" style="background-color: <?php echo ($row['faccion'] == 'Sentinel') ? 'Red' : 'Green'; ?>;">
                 <table>
-                    <tr>
+                    <!-- <tr>
+                        <//?php
+                        mysqli_data_seek($resulth, 0); // Reset the result pointer to the beginning
+                        while ($rowh = mysqli_fetch_assoc($resulth)) {
+                            if ($row['atributo'] == $rowh['atributo'] && $row['id'] == $rowh['n_casa']) {
+                        ?>
                         <td><a href="pagina1.html" class="image-button">
-                            <img src="icons/Salto Oscuro.png" alt="Opción 1">
-                            <div class="image-caption">Opción 1</div></a>
+                            <img src="<//?php echo $rowh['icono']; ?>" alt="<//?php echo $rowh['nombre']; ?>">
+                            <div class="image-caption"><//?php echo $rowh['nombre']; ?></div></a>
                         </td>
-                        <td><a href="pagina3.html" class="image-button">
-                            <img src="icons/Salto Oscuro.png" alt="Opción 3">
-                            <div class="image-caption">Opción 3</div>
-                            </a>
-                        </td>
-                        <td><a href="pagina2.html" class="image-button">
-                            <img src="icons/Salto Oscuro.png" alt="Opción 2">
-                            <div class="image-caption">Opción 2</div>
-                            </a>
-                        </td>
-                        <td><a href="pagina4.html" class="image-button">
-                            <img src="icons/Salto Oscuro.png" alt="Opción 4">
-                            <div class="image-caption">Opción 4</div>
-                            </a>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><a href="pagina5.html" class="image-button">
-                            <img src="icons/Salto Oscuro.png" alt="Opción 5">
-                            <div class="image-caption">Opción 5</div>
-                            </a>
-                        </td>
-                        <td><a href="pagina6.html" class="image-button">
-                            <img src="icons/Salto Oscuro.png" alt="Opción 6">
-                            <div class="image-caption">Opción 6</div>
-                            </a>
-                        </td>
-                    </tr>
-                </table>
-            </div>
-            <div class="grid-container">
-                <table>
-                    <tr>
-                        <td><a href="pagina8.html" class="image-button">
-                            <img src="icons/Salto Oscuro.png" alt="Opción 1">
-                            <div class="image-caption">Opción 1</div></a>
-                        </td>
-                        <td><a href="pagina9.html" class="image-button">
-                            <img src="icons/Salto Oscuro.png" alt="Opción 3">
-                            <div class="image-caption">Opción 3</div>
-                            </a>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><a href="pagina10.html" class="image-button">
-                            <img src="icons/Salto Oscuro.png" alt="Opción 5">
-                            <div class="image-caption">Opción 5</div>
-                            </a>
-                        </td>
-                        <td><a href="pagina11.html" class="image-button">
-                            <img src="icons/Salto Oscuro.png" alt="Opción 6">
-                            <div class="image-caption">Opción 6</div>
-                            </a>
-                        </td>
-                    </tr>
-                </table>
-            </div>
-            <div class="grid-container">
+                        <//?php
+                            }
+                        }
+                        ?>
+                    </tr> -->
+                    <?php
+                        mysqli_data_seek($resulth, 0); // Reset pointer
+                        // Filtrar héroes de la casa actual
+                        $heroesCasa = [];
+                        while ($rowh = mysqli_fetch_assoc($resulth)) {
+                            if ($row['atributo'] == $rowh['atributo'] && $row['id'] == $rowh['n_casa']) {
+                                $heroesCasa[] = $rowh;
+                            }
+                        }
+                        // Mostrar en filas de 4 columnas
+                        $col = 0;
+                        echo "<tr>";
+                        foreach ($heroesCasa as $hero) {
+                            echo "<td><a href='pagina1.html' class='image-button'>
+                                    <img src='{$hero['icono']}' alt='{$hero['nombre']}'>
+                                    <div class='image-caption'>{$hero['nombre']}</div>
+                                </a></td>";
+                            $col++;
+                            if ($col % 4 == 0) echo "</tr><tr>";
+                        }
+                        // Cerrar fila si quedó incompleta
+                        if ($col % 4 != 0) echo str_repeat("<td></td>", 4 - ($col % 4)) . "</tr>";
 
+                        // Alternativamente, usar array_chunk para dividir en filas de 4
+                        /*foreach (array_chunk($heroesCasa, 4) as $fila) {
+                            echo "<tr>";
+                            foreach ($fila as $hero) {
+                                echo "<td><a href='pagina1.html' class='image-button'>
+                                    <img src='{$hero['icono']}' alt='{$hero['nombre']}'>
+                                    <div class='image-caption'>{$hero['nombre']}</div>
+                                </a></td>";
+                            }
+                            echo "</tr>";
+                        }*/
+                    ?>
+                </table>
             </div>
-            <div class="grid-container">
-                
-            </div>   
+            <?php
+            }
+            ?>           
         </div>
-    </div>  
-    
+    </div>     
 </body>
 </html>
